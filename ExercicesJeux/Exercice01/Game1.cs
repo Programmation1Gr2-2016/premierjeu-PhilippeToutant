@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-
+using System;
 namespace Exercice01
 {
     /// <summary>
@@ -15,14 +15,15 @@ namespace Exercice01
         SpriteBatch spriteBatch;
         Rectangle fenetre;
         GameObject heros;
-        GameObject bowser;
         GameObject balle;
-        GameObject nombreEnnemis;
-        GameObject front;
+        GameObject[] tabEnnemis= new GameObject [10];
+        GameObject fond;
         bool balleSortie = false;
         SoundEffect son;
         SoundEffectInstance bombe;
         SpriteFont font;
+        Random r = new Random();
+        int nombreEnnemies = 0;
 
         public Game1()
         {
@@ -60,12 +61,18 @@ namespace Exercice01
             heros.position = heros.sprite.Bounds;
             heros.position.Offset(0, fenetre.Height - heros.position.Height);
 
-            bowser = new GameObject();
-            bowser.estVivant = true;
-            bowser.vitesse = 3;
-            bowser.sprite = Content.Load<Texture2D>("Bowser.png");
-            bowser.position = bowser.sprite.Bounds;
-            bowser.position.Offset(100, 0);         
+            for (int i = 0; i <tabEnnemis.Length; i++)
+            {
+                tabEnnemis[i] = new GameObject();
+                tabEnnemis[i].estVivant = true;
+                tabEnnemis[i].vitesse = 3;
+                tabEnnemis[i].sprite = Content.Load<Texture2D>("Bowser.png");
+                tabEnnemis[i].position = tabEnnemis[i].sprite.Bounds;
+                tabEnnemis[i].position.Offset(350, 200);
+                tabEnnemis[i].direction.X = r.Next(-4, 5);
+                tabEnnemis[i].direction.Y = r.Next(-4, 5);
+
+            }
 
             balle = new GameObject();
             balle.estVivant = true;
@@ -73,17 +80,19 @@ namespace Exercice01
             balle.sprite = Content.Load<Texture2D>("120px-Spiny_Egg_PMttyd.png");
             balle.position = balle.sprite.Bounds;
             balle.position.Offset(100, 0);
-
+        
             son = Content.Load<SoundEffect>("bombe");
             bombe = son.CreateInstance();
+
             Song song = Content.Load<Song>("DARK SOULS SONG - YOU DIED!");
-            MediaPlayer.Play(song);
+            MediaPlayer.Play(song);           
 
-            front = new GameObject();
-            front.sprite = Content.Load<Texture2D>("city.png");
-            front.position = front.sprite.Bounds;
-            front.position.Offset(0, 0);
+            fond = new GameObject();
+            fond.sprite = Content.Load<Texture2D>("city.png");
+            fond.position = fond.sprite.Bounds;
+            fond.position.Offset(0, 0);
 
+            font = Content.Load<SpriteFont>("Font");
             // TODO: use this.Content to load your game content here
         }
 
@@ -108,7 +117,7 @@ namespace Exercice01
                 Exit();
 
             // TODO: Add your update logic here
-
+            //bouger
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
                 heros.position.Y += heros.vitesse;
@@ -127,19 +136,31 @@ namespace Exercice01
             }
 
             UpdateHeros();
-            for (int nombreEnnemis = 0; nombreEnnemis < 10; nombreEnnemis++)
+            //ennemies
+      
+            for (int i = 0; i < nombreEnnemies; i++)
             {
-                if (bowser.position.X == 0)
-                {
-                    bowser.vitesse = 5;
-                }
-                if (bowser.position.X == fenetre.Right - bowser.sprite.Width)
-                {
-                    bowser.vitesse = -5;
-                }
-                bowser.position.X += bowser.vitesse;
+                tabEnnemis[i].position.X += (int)tabEnnemis[i].direction.X;
+                tabEnnemis[i].position.Y += (int)tabEnnemis[i].direction.Y;
 
-                if (bowser.position.Intersects(heros.position))
+                if (tabEnnemis[i].position.X > fenetre.Right - heros.sprite.Width)
+                {
+                    tabEnnemis[i].direction.X = -(int)tabEnnemis[i].direction.X;                            
+                }
+                if (tabEnnemis[i].position.X < fenetre.Left)
+                {
+                    tabEnnemis[i].direction.X = -(int)tabEnnemis[i].direction.X;            
+                }
+                if (tabEnnemis[i].position.Y > fenetre.Top)
+                {
+                    tabEnnemis[i].direction.Y = -(int)tabEnnemis[i].direction.Y ;            
+                }
+                if (tabEnnemis[i].position.Y < fenetre.Bottom - heros.sprite.Height)
+                {
+                    tabEnnemis[i].direction.Y = -(int)tabEnnemis[i].direction.Y ;                 
+                }
+
+                if (tabEnnemis[i].position.Intersects(heros.position))
                 {
                     heros.estVivant = false;
                     bombe.Play();
@@ -149,8 +170,20 @@ namespace Exercice01
                     heros.estVivant = false;
                     bombe.Play();
                 }
+                if (balleSortie == true)
+                {
+                    balle.position.X = tabEnnemis[i].position.X;
+                    balle.position.Y = tabEnnemis[i].position.Y + 60;
+                    balleSortie = false;
+                }
             }
-
+   
+            // paramètre de la balle
+            if (balle.position.Intersects(heros.position))
+            {
+                heros.estVivant = false;
+                bombe.Play();
+            }
             if (balle.position.Y > fenetre.Bottom)
             {
                 for (int i = 1; i < 11; i++)
@@ -169,21 +202,21 @@ namespace Exercice01
                 balle.vitesse = 5;
                 balle.position.Y += balle.vitesse;
             }
-            if (balleSortie == true)
-            {
-                balle.position.X = bowser.position.X;
-                balle.position.Y = bowser.position.Y + 60;
-                balleSortie = false;
-            }
+
             if (balle.position.Y > fenetre.Bottom - balle.sprite.Bounds.Height)
             {
                 balleSortie = true;
+            }
+            if (nombreEnnemies * 5 < gameTime.TotalGameTime.Seconds)
+            {
+                nombreEnnemies++;
             }
 
             base.Update(gameTime);
         }
         protected void UpdateHeros()
         {
+            //protection de sortie
             if (heros.position.X < fenetre.Left)
             {
                 heros.position.X = fenetre.Left;
@@ -201,25 +234,26 @@ namespace Exercice01
                 heros.position.Y = fenetre.Bottom - heros.sprite.Height;
             }
 
-            if (bowser.position.X < fenetre.Left)
+            for (int i = 0; i < nombreEnnemies; i++)
             {
-                bowser.position.X = fenetre.Left;
+                if (tabEnnemis[i].position.X < fenetre.Left)
+                {
+                    tabEnnemis[i].position.X = fenetre.Left;
+                }
+                if (tabEnnemis[i].position.Y < fenetre.Top)
+                {
+                    tabEnnemis[i].position.Y = fenetre.Top;
+                }
+                if (tabEnnemis[i].position.X > fenetre.Right - tabEnnemis[i].sprite.Width)
+                {
+                    tabEnnemis[i].position.X = fenetre.Right - tabEnnemis[i].sprite.Width;
+                }
+                if (tabEnnemis[i].position.Y > fenetre.Bottom - tabEnnemis[i].sprite.Height)
+                {
+                    tabEnnemis[i].position.Y = fenetre.Bottom - tabEnnemis[i].sprite.Height;
+                }
             }
-            if (bowser.position.Y < fenetre.Top)
-            {
-                bowser.position.Y = fenetre.Top;
-            }
-            if (bowser.position.X > fenetre.Right - bowser.sprite.Width)
-            {
-                bowser.position.X = fenetre.Right - bowser.sprite.Width;
-            }
-            if (bowser.position.Y > fenetre.Bottom - bowser.sprite.Height)
-            {
-                bowser.position.Y = fenetre.Bottom - bowser.sprite.Height;
-            }
-
         }
-
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -227,21 +261,27 @@ namespace Exercice01
         protected override void Draw(GameTime gameTime)
         {
             spriteBatch.Begin();
-
-            spriteBatch.Draw(front.sprite, front.position, Color.White);
-
+            spriteBatch.Draw(fond.sprite, fond.position, Color.White);
             // TODO: Add your drawing code here
+
+            // draw heros
             if (heros.estVivant == true)
             {
                 spriteBatch.Draw(heros.sprite, heros.position, Color.White);
             }
-
-            for (int nombreEnnemis = 0; nombreEnnemis < 10; nombreEnnemis++)
+            //game over
+            if (heros.estVivant == false)
             {
-                spriteBatch.Draw(bowser.sprite, bowser.position, Color.White);
+                spriteBatch.DrawString(font, "Game Over!", new Vector2(300, 200), Color.Black);
+               // spriteBatch.DrawString(font, GameTime, new Vector2(300, 200), Color.Black);
             }
-            spriteBatch.Draw(balle.sprite, balle.position, Color.White);
+            //draw ennemis
+            for (int i = 0; i < nombreEnnemies; i++)
+            {
+                spriteBatch.Draw(tabEnnemis[i].sprite, tabEnnemis[i].position, Color.White);
+            }
 
+            spriteBatch.Draw(balle.sprite, balle.position, Color.White);
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.End();

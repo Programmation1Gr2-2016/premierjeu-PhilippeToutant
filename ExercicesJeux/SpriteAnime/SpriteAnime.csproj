@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B89D889B-AC69-4A8D-8D52-03C643B3178D}</ProjectGuid>
+    <ProjectGuid>{0A79B6FE-CEB9-47E0-A7DC-77B63AF9FD2B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Exercice01</RootNamespace>
-    <AssemblyName>Exercice01</AssemblyName>
+    <RootNamespace>SpriteAnime</RootNamespace>
+    <AssemblyName>SpriteAnime</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -39,7 +39,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
-    <Compile Include="GameObject.cs" />
+    <Compile Include="GameObjectAnimé.cs" />
+    <Compile Include="GameObjectTile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -51,19 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\120px-Spiny_Egg_PMttyd.png">
+    <Content Include="Content\hyptosis_tile-art-batch-1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Bowser.png">
+    <Content Include="Content\straight_outta_undertale_chara_frisk_spritesheet_by_toreodere-d9ko1g9.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\city.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Mario.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\bombe.wav" />
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
