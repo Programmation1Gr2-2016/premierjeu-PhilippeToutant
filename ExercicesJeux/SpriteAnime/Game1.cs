@@ -176,20 +176,23 @@ namespace SpriteAnime
                                 rambo.position = new Rectangle(50, 50, 65, 65);
                                 Nombredereussite ++;
 
+                                gameTimeBest = gameTimeTotal;
+
+                                Wannabe = gameTimeTotal - gameTimeBest;
                                 if (gameTimeBest > Wannabe)
                                 {
                                     gameTimeBest = Wannabe;
                                 }
-                                gameTimeTotal = gameTime.TotalGameTime.Seconds;
-                                gameTimeBest = gameTimeTotal - gameTime.TotalGameTime.Seconds;
                                 break;
                         }
                     }
                 }
             }
+            gameTimeTotal = gameTime.TotalGameTime.Seconds;
+
             if (Nombredevie==0)
             {
-                gameTimeMoyenne = gameTime.TotalGameTime.Seconds / Nombredereussite;
+                gameTimeMoyenne = gameTimeTotal / Nombredereussite;
             }
             base.Update(gameTime);
         }
